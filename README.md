@@ -1,4 +1,12 @@
-***Dungeon Explorer is an immersive and collaborative Dungeons and Dragons-inspired maze exploration game designed for multiplayer engagement. Leveraging Flask and Socket.IO, the game provides a real-time and interactive experience, allowing players to traverse mysterious dungeons, face challenges, and discover hidden treasures.***
+# Clone the repository to your local machine:
+```git clone <repository-url>```
+
+# Navigate to the directory where you cloned the repository:
+```cd <repository-directory```
+
+
+
+***Dungeon Explorer is an immersive and collaborative Dungeons and Dragons-inspired maze exploration game designed for multiplayer engagement. The project is a multiplayer text-based game server that allows multiple players to connect and interact with each other in a Dungeons & Dragons (D&D) themed maze environment. Players navigate through the maze, encounter challenges, and communicate with each other as they progress through the game.***
 ### Replace the placeholder ```api_key``` in the file ```AI_MAZE.py``` with your actual ```Open API key```.
 
 # Running the Server:
@@ -16,3 +24,7 @@ Run the client script to connect each player to the server:
 
 
 **Use ```/generate_maze``` command to generate a D&D maze or any other relevant commands to progress in the game.**
+
+
+
+**Replace <repository-url> with the URL of the repository where you cloned the game files, and <repository-directory> with the name of the directory created after cloning the repository. Also, ensure to replace "api_key" with your actual OpenAI API key in the AI_MAZE.py file before running the server and connecting players.**
