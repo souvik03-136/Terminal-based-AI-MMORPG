@@ -1,12 +1,14 @@
+***Dungeon Explorer is an immersive and collaborative Dungeons and Dragons-inspired maze exploration game designed for multiplayer engagement. The project is a multiplayer text-based game server that allows multiple players to connect and interact with each other in a Dungeons & Dragons (D&D) themed maze environment. Players navigate through the maze, encounter challenges, and communicate with each other as they progress through the game.***
+
+
+
+
 # Clone the repository to your local machine:
 ```git clone <repository-url>```
 
 # Navigate to the directory where you cloned the repository:
 ```cd <repository-directory```
 
-
-
-***Dungeon Explorer is an immersive and collaborative Dungeons and Dragons-inspired maze exploration game designed for multiplayer engagement. The project is a multiplayer text-based game server that allows multiple players to connect and interact with each other in a Dungeons & Dragons (D&D) themed maze environment. Players navigate through the maze, encounter challenges, and communicate with each other as they progress through the game.***
 ### Replace the placeholder ```api_key``` in the file ```AI_MAZE.py``` with your actual ```Open API key```.
 
 # Running the Server:
