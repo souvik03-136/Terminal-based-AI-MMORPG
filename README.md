@@ -9,7 +9,7 @@
 # Navigate to the directory where you cloned the repository:
 ```cd <repository-directory```
 
-### Replace the placeholder ```api_key``` in the file ```AI_MAZE.py``` with your actual ```Open API key```.
+### Replace the placeholder ```api_key``` in the file ```AI_MAZE.py``` with your actual ```Gemini API key```.
 
 # Running the Server:
 Open a terminal window or tab.
