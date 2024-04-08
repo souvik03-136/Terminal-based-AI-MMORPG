@@ -1,11 +1,9 @@
-# client.py
-
 import socket
+
 
 def main():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client_socket.connect(('localhost', 8888))
-
     while True:
         command = input("Enter your command: ")
         client_socket.send(command.encode())
