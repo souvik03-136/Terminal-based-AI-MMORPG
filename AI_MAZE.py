@@ -3,10 +3,10 @@ import google.generativeai as genai
 genai.configure(api_key="api_key")
 
 def generate_dnd_maze():
-    text = "Develop a playable Dungeons and Dragons scenario where the player navigates a 20x40 ASCII dungeon maze using the W, A, S, D keys." \
-           " Draw the maze with a designated start (S) and end (E) point. Integrate components like traps and challenges." \
-           " Offer commands for gameplay and request descriptions for each new scenario. " \
-           "Commence by illustrating the initial maze and setting the stage for an immersive adventure."
+    text = "Craft an engaging Dungeons and Dragons scenario featuring a 20x40 ASCII dungeon maze, where players navigate using W, A, S, and D keys." \
+           " Begin with an illustrated maze showing a designated start (S) and end (E) point. " \
+           "Incorporate traps, challenges, and commands for gameplay, seeking descriptions for each scenario. " \
+           "Create an immersive adventure by setting the stage with a detailed maze description, storyline, and challenges awaiting the players."
     model = genai.GenerativeModel("gemini-pro")
     response = model.generate_content(text)
     return response.text
