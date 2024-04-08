@@ -1,5 +1,3 @@
-# server.py
-
 import socket
 import threading
 from AI_MAZE import generate_dnd_maze, play
