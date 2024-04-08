@@ -29,4 +29,4 @@ Run the client script to connect each player to the server:
 
 
 
-**Replace <repository-url> with the URL of the repository where you cloned the game files, and <repository-directory> with the name of the directory created after cloning the repository. Also, ensure to replace "api_key" with your actual OpenAI API key in the AI_MAZE.py file before running the server and connecting players.**
+**Replace <repository-url> with the URL of the repository where you cloned the game files, and <repository-directory> with the name of the directory created after cloning the repository. Also, ensure to replace "api_key" with your actual Gemini API key in the AI_MAZE.py file before running the server and connecting players.**
