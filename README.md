@@ -26,6 +26,7 @@ Run the client script to connect each player to the server:
 
 
 **Use ```/generate_maze``` command to generate a D&D maze or any other relevant commands to progress in the game.**
+**Use the ```/msg``` command followed by the message for game conversation.**
 
 
 
