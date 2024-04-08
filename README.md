@@ -9,7 +9,7 @@
 # Navigate to the directory where you cloned the repository:
 ```cd <repository-directory```
 
-### Replace the placeholder ```api_key``` in the file ```AI_MAZE.py``` with your actual ```Gemini API key```.
+### Create a .env file  and  place this command ```API_KEY = apikey``` replace **apikey** with the actual Gemini Api Key.
 
 # Running the Server:
 Open a terminal window or tab.
@@ -29,4 +29,4 @@ Run the client script to connect each player to the server:
 
 
 
-**Replace <repository-url> with the URL of the repository where you cloned the game files, and <repository-directory> with the name of the directory created after cloning the repository. Also, ensure to replace "api_key" with your actual Gemini API key in the AI_MAZE.py file before running the server and connecting players.**
+**Replace <repository-url> with the URL of the repository where you cloned the game files, and <repository-directory> with the name of the directory created after cloning the repository. Also, ensure to replace "apikey" with your actual Gemini API key in the .env file before running the server and connecting players.**
