@@ -29,6 +29,8 @@ Run the client script to connect each player to the server:
 
 **Use the ```/msg``` command followed by the message for game conversation.**
 
+**Use the ```/roll-dice``` command to determine which player plays next.**
+
 
 
 **Replace <repository-url> with the URL of the repository where you cloned the game files, and <repository-directory> with the name of the directory created after cloning the repository. Also, ensure to replace "apikey" with your actual Gemini API key in the .env file before running the server and connecting players.**
