@@ -9,7 +9,7 @@
 # Navigate to the directory where you cloned the repository:
 ```cd <repository-directory```
 
-### Create a .env file  and  place this command ```API_KEY = apikey``` replace ```apikey``` with the actual Gemini Api Key.
+### In the .env file, place the actual Gemini API key and the port number.
 
 # Running the Server:
 Open a terminal window or tab.
@@ -28,6 +28,8 @@ Run the client script to connect each player to the server:
 **Use ```/generate_maze``` command to generate a D&D maze or any other relevant commands to progress in the game.**
 
 **Use the ```/msg``` command followed by the message for game conversation.**
+
+**Use the ```/roll-dice``` command to determine which player plays next.**
 
 
 
