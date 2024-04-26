@@ -25,7 +25,7 @@ def handle_client_connection(client_socket):
 
         elif command.startswith('/msg'):
             message = command.split(' ', 1)[1]
-            broadcast_message = f"Player {client_socket.getpeername()}: {message}"
+            broadcast_message = f"Player {client_socket.getpeername()[1]}: {message}"
             print(broadcast_message)
             broadcast(broadcast_message.encode())
         else:

@@ -1,0 +1,5 @@
+google-generativeai
+dotenv
+socket
+threading
+os
