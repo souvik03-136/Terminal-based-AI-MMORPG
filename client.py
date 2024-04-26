@@ -1,9 +1,15 @@
 import socket
+from dotenv import load_dotenv
+import os
+
+
+load_dotenv()
+PORT = int(os.getenv("PORT"))
 
 
 def main():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(('localhost', 8888))
+    client_socket.connect(('localhost', PORT))
     while True:
         command = input("Enter your command: ")
         client_socket.send(command.encode())
