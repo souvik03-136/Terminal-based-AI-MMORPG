@@ -9,7 +9,7 @@
 # Navigate to the directory where you cloned the repository:
 ```cd <repository-directory```
 
-### Create a .env file  and  place this command ```API_KEY = apikey``` replace ```apikey``` with the actual Gemini Api Key.
+### In the .env file, place the actual Gemini API key and the port number.
 
 # Running the Server:
 Open a terminal window or tab.
