@@ -11,6 +11,10 @@
 
 ### In the .env file, place the actual Gemini API key and the port number.
 
+# Install Dependencies:
+```pip install google-generativeai```
+```pip install python-dotenv```
+
 # Running the Server:
 Open a terminal window or tab.
 Navigate to the directory containing the game files.
