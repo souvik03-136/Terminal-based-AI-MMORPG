@@ -2,6 +2,7 @@ import random
 from typing import Dict
 
 from server.ai.context_manager import PlayerContext
+from server.ai.gemini_client import gemini
 from server.game.combat import CombatEngine
 from server.game.events import EventEngine
 from server.game.player import Player
@@ -16,9 +17,26 @@ def handle_fight(player: Player, context: PlayerContext) -> str:
     p_dmg, p_crit = CombatEngine.player_attacks(player)
     e_dmg, e_crit = CombatEngine.enemy_attacks(player)
 
-    summary = CombatEngine.combat_summary(player, p_dmg, e_dmg, p_crit, e_crit)
+    # Narration: offline uses fallback, online uses CombatEngine summary
+    if gemini.mode == "offline":
+        from server.ai.fallback_engine import fallback
+
+        narration = fallback.generate_combat_round(
+            player.name,
+            enemy["name"],
+            p_dmg,
+            e_dmg,
+            p_crit,
+            e_crit,
+            enemy["hp"],
+            player.stats.hp,
+            player.stats.max_hp,
+        )
+    else:
+        narration = CombatEngine.combat_summary(player, p_dmg, e_dmg, p_crit, e_crit)
 
     outcome_msg = ""
+
     if enemy["hp"] <= 0:
         xp_gain = int(enemy["xp"])
         gold_gain = int(enemy["gold"])
@@ -29,8 +47,15 @@ def handle_fight(player: Player, context: PlayerContext) -> str:
         loot = EventEngine.random_loot(player.stats.floor)
         player.inventory.add_item(loot)
 
+        if gemini.mode == "offline":
+            from server.ai.fallback_engine import fallback
+
+            victory_line = fallback.generate_victory(enemy["name"])
+        else:
+            victory_line = f"{enemy['name']} has been slain!"
+
         outcome_msg = (
-            f"\n  🏆 {enemy['name']} has been slain!\n"
+            f"\n  🏆 {victory_line}\n"
             f"  +{xp_gain} XP  +{gold_gain} Gold  Loot: {loot.name}\n"
             f"{player.stats_block()}"
         )
@@ -39,9 +64,17 @@ def handle_fight(player: Player, context: PlayerContext) -> str:
     elif not player.stats.is_alive():
         player.is_alive = False
         player.in_combat = False
+
+        if gemini.mode == "offline":
+            from server.ai.fallback_engine import fallback
+
+            death_line = fallback.generate_death(enemy["name"])
+        else:
+            death_line = "You have fallen in the darkness..."
+
         outcome_msg = (
             f"\n  💀 ════════════════════════════════ 💀\n"
-            f"     YOU HAVE FALLEN IN THE DARKNESS...\n"
+            f"  {death_line}\n"
             f"       {player.name} has met their end.\n"
             f"  💀 ════════════════════════════════ 💀\n"
             f"  Type /respawn to begin again."
@@ -51,7 +84,7 @@ def handle_fight(player: Player, context: PlayerContext) -> str:
             exclude=player,
         )
 
-    return summary + outcome_msg
+    return narration + outcome_msg
 
 
 def handle_flee(player: Player, context: PlayerContext) -> str:

@@ -25,14 +25,22 @@ WELCOME_BANNER = r"""
   ═══════════════════════════════════════════════════════════════
 """
 
+BANNER_AI = "  ✨  Mode: AI Narration (Gemini)  — the dungeon breathes with intelligence.\n"
+BANNER_OFFLINE = (
+    "  ⚔   Mode: Offline  — handcrafted dungeons, no API key required.\n"
+    "  Tip: Set GEMINI_API_KEY in .env to unlock AI narration.\n"
+)
+
 
 def handle_client(client_socket: socket.socket, address: tuple) -> None:
     logger.info(f"New connection from {address}")
     player: Optional[Player] = None
 
     try:
-        client_socket.send(WELCOME_BANNER.encode())
+        mode_line = BANNER_AI if gemini.mode == "gemini" else BANNER_OFFLINE
+        client_socket.send((WELCOME_BANNER + mode_line).encode())
         client_socket.send("  Enter your adventurer's name: ".encode())
+
         name_raw = client_socket.recv(256).decode().strip()
         name = name_raw[:16] if name_raw else f"Stranger_{address[1]}"
 
@@ -40,7 +48,14 @@ def handle_client(client_socket: socket.socket, address: tuple) -> None:
         context = PlayerContext(max_messages=config.MAX_CONTEXT_MESSAGES)
         sessions.add_player(player)
 
-        opening = gemini.generate(MAZE_GENERATION_PROMPT)
+        # Generate opening floor
+        if gemini.mode == "offline":
+            from server.ai.fallback_engine import fallback
+
+            opening = fallback.generate_floor(1)
+        else:
+            opening = gemini.generate(MAZE_GENERATION_PROMPT)
+
         world.set_floor_description(1, opening)
         context.set_dungeon_summary(opening[:300])
         context.add_exchange("Player enters the dungeon", opening)
@@ -102,6 +117,7 @@ class GameServer:
         self._server_socket.listen(config.MAX_PLAYERS)
 
         logger.info(f"Dungeon Explorer server started on {config.HOST}:{config.PORT}")
+        logger.info(f"AI mode: {gemini.mode}")
         logger.info(f"Max players: {config.MAX_PLAYERS}")
 
         try:
