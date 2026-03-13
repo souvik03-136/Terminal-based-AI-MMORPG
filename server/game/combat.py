@@ -1,6 +1,7 @@
-from typing import Tuple
-from server.game.player import Player
+from typing import Dict, Tuple
+
 from server.game.dice import Dice
+from server.game.player import Player
 
 
 class CombatEngine:
@@ -9,6 +10,9 @@ class CombatEngine:
     @staticmethod
     def player_attacks(player: Player) -> Tuple[int, bool]:
         """Player attacks current enemy. Returns (damage, is_crit)."""
+        assert player.current_enemy is not None, "player_attacks called outside of combat"
+        enemy: Dict = player.current_enemy
+
         roll = Dice.roll_d20()
         is_crit = roll == 20
         base_dmg = player.stats.attack
@@ -19,7 +23,6 @@ class CombatEngine:
         else:
             dmg = max(1, base_dmg // 2)
 
-        enemy = player.current_enemy
         enemy_def = enemy.get("defense", 0)
         actual = max(1, dmg - enemy_def // 2)
         enemy["hp"] -= actual
@@ -28,7 +31,9 @@ class CombatEngine:
     @staticmethod
     def enemy_attacks(player: Player) -> Tuple[int, bool]:
         """Enemy attacks player. Returns (damage_taken, is_crit)."""
-        enemy = player.current_enemy
+        assert player.current_enemy is not None, "enemy_attacks called outside of combat"
+        enemy: Dict = player.current_enemy
+
         roll = Dice.roll_d20()
         is_crit = roll == 20
         base_dmg = enemy.get("attack", 10)
@@ -43,9 +48,16 @@ class CombatEngine:
         return actual, is_crit
 
     @staticmethod
-    def combat_summary(player: Player, p_dmg: int, e_dmg: int,
-                       p_crit: bool, e_crit: bool) -> str:
-        enemy = player.current_enemy
+    def combat_summary(
+        player: Player,
+        p_dmg: int,
+        e_dmg: int,
+        p_crit: bool,
+        e_crit: bool,
+    ) -> str:
+        assert player.current_enemy is not None
+        enemy: Dict = player.current_enemy
+
         crit_str_p = " ⚡ CRITICAL STRIKE!" if p_crit else ""
         crit_str_e = " ⚡ CRITICAL HIT!" if e_crit else ""
         alive = "alive" if player.stats.is_alive() else "DEFEATED"

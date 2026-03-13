@@ -1,14 +1,16 @@
+import logging
 import socket
 import threading
-import logging
-from server.config import config
-from server.game.player import Player
+from typing import Optional
+
 from server.ai.context_manager import PlayerContext
 from server.ai.gemini_client import gemini
 from server.ai.prompts import MAZE_GENERATION_PROMPT
-from server.session_manager import sessions
 from server.command_router import router
+from server.config import config
+from server.game.player import Player
 from server.game.world import world
+from server.session_manager import sessions
 
 logger = logging.getLogger(__name__)
 
@@ -23,11 +25,12 @@ WELCOME_BANNER = r"""
   ═══════════════════════════════════════════════════════════════
 """
 
-def handle_client(client_socket: socket.socket, address: tuple):
+
+def handle_client(client_socket: socket.socket, address: tuple) -> None:
     logger.info(f"New connection from {address}")
+    player: Optional[Player] = None
 
     try:
-        # Greet and get player name
         client_socket.send(WELCOME_BANNER.encode())
         client_socket.send("  Enter your adventurer's name: ".encode())
         name_raw = client_socket.recv(256).decode().strip()
@@ -37,7 +40,6 @@ def handle_client(client_socket: socket.socket, address: tuple):
         context = PlayerContext(max_messages=config.MAX_CONTEXT_MESSAGES)
         sessions.add_player(player)
 
-        # Generate opening floor
         opening = gemini.generate(MAZE_GENERATION_PROMPT)
         world.set_floor_description(1, opening)
         context.set_dungeon_summary(opening[:300])
@@ -52,7 +54,6 @@ def handle_client(client_socket: socket.socket, address: tuple):
             f"  Type /help to see all commands.\n"
         )
 
-        # Main game loop
         while True:
             try:
                 data = client_socket.recv(config.BUFFER_SIZE)
@@ -75,10 +76,10 @@ def handle_client(client_socket: socket.socket, address: tuple):
     except Exception as e:
         logger.exception(f"Error handling client {address}: {e}")
     finally:
-        _cleanup(client_socket, locals().get("player"))
+        _cleanup(client_socket, player)
 
 
-def _cleanup(client_socket: socket.socket, player: Player = None):
+def _cleanup(client_socket: socket.socket, player: Optional[Player] = None) -> None:
     if player:
         sessions.remove_player(player)
         sessions.broadcast(f"\n  📢 {player.name} has left the dungeon.")
@@ -90,10 +91,10 @@ def _cleanup(client_socket: socket.socket, player: Player = None):
 
 
 class GameServer:
-    def __init__(self):
-        self._server_socket = None
+    def __init__(self) -> None:
+        self._server_socket: Optional[socket.socket] = None
 
-    def start(self):
+    def start(self) -> None:
         config.validate()
         self._server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self._server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)

@@ -1,8 +1,10 @@
 import random
-from server.game.player import Player
+from typing import Dict
+
+from server.ai.context_manager import PlayerContext
 from server.game.combat import CombatEngine
 from server.game.events import EventEngine
-from server.ai.context_manager import PlayerContext
+from server.game.player import Player
 from server.session_manager import sessions
 
 
@@ -10,7 +12,7 @@ def handle_fight(player: Player, context: PlayerContext) -> str:
     if not player.in_combat or not player.current_enemy:
         return "  You are not in combat. Explore the dungeon first."
 
-    enemy = player.current_enemy
+    enemy: Dict = player.current_enemy
     p_dmg, p_crit = CombatEngine.player_attacks(player)
     e_dmg, e_crit = CombatEngine.enemy_attacks(player)
 
@@ -18,8 +20,8 @@ def handle_fight(player: Player, context: PlayerContext) -> str:
 
     outcome_msg = ""
     if enemy["hp"] <= 0:
-        xp_gain = enemy["xp"]
-        gold_gain = enemy["gold"]
+        xp_gain = int(enemy["xp"])
+        gold_gain = int(enemy["gold"])
         player.stats.gain_xp(xp_gain)
         player.stats.gold += gold_gain
         player.in_combat = False
@@ -46,15 +48,16 @@ def handle_fight(player: Player, context: PlayerContext) -> str:
         )
         sessions.broadcast(
             f"  ☠  {player.name} was slain by a {enemy['name']}...",
-            exclude=player
+            exclude=player,
         )
 
     return summary + outcome_msg
 
 
 def handle_flee(player: Player, context: PlayerContext) -> str:
-    if not player.in_combat:
+    if not player.in_combat or not player.current_enemy:
         return "  You're not in combat."
+    enemy: Dict = player.current_enemy
     if random.randint(1, 100) <= 40:
         player.in_combat = False
         player.current_enemy = None
@@ -63,11 +66,11 @@ def handle_flee(player: Player, context: PlayerContext) -> str:
             "  Your heart pounds... but you're safe. For now."
         )
     else:
-        enemy = player.current_enemy
         e_dmg, _ = CombatEngine.enemy_attacks(player)
         return (
             f"  You try to flee, but {enemy['name']} cuts you off!\n"
-            f"  You take {e_dmg} damage in the attempt! HP: {player.stats.hp}/{player.stats.max_hp}"
+            f"  You take {e_dmg} damage in the attempt!"
+            f" HP: {player.stats.hp}/{player.stats.max_hp}"
         )
 
 

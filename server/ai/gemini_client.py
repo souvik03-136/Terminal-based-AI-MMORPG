@@ -1,9 +1,13 @@
 import logging
+from typing import List, Optional
+
 import google.generativeai as genai
-from server.config import config
+
 from server.ai.prompts import SYSTEM_PROMPT
+from server.config import config
 
 logger = logging.getLogger(__name__)
+
 
 class GeminiClient:
     """Singleton wrapper around the Gemini API."""
@@ -27,7 +31,7 @@ class GeminiClient:
         self._initialized = True
         logger.info(f"Gemini client initialized with model: {config.AI_MODEL}")
 
-    def generate(self, prompt: str, history: list = None) -> str:
+    def generate(self, prompt: str, history: Optional[List] = None) -> str:
         """Generate a response, optionally with conversation history."""
         try:
             if history:
@@ -39,5 +43,6 @@ class GeminiClient:
         except Exception as e:
             logger.error(f"Gemini API error: {e}")
             return "The dungeon magic falters... (AI error, please try again)"
+
 
 gemini = GeminiClient()

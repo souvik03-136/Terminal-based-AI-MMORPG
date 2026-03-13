@@ -1,14 +1,17 @@
-import socket
 import logging
-from server.config import config   # reuse config
+import socket
+from typing import Optional
+
+from server.config import config
 
 logger = logging.getLogger(__name__)
 
+
 class Connection:
-    def __init__(self, host: str = None, port: int = None):
-        self.host = host or config.HOST
-        self.port = port or config.PORT
-        self._socket = None
+    def __init__(self, host: Optional[str] = None, port: Optional[int] = None):
+        self.host: str = host or config.HOST
+        self.port: int = port or config.PORT
+        self._socket: Optional[socket.socket] = None
 
     def connect(self) -> bool:
         try:
@@ -21,7 +24,7 @@ class Connection:
             print("  Make sure the server is running first.\n")
             return False
 
-    def send(self, message: str):
+    def send(self, message: str) -> None:
         if self._socket:
             self._socket.send(message.encode())
 
@@ -31,6 +34,6 @@ class Connection:
             return data.decode("utf-8", errors="replace")
         return ""
 
-    def close(self):
+    def close(self) -> None:
         if self._socket:
             self._socket.close()

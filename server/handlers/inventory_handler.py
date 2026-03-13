@@ -1,11 +1,13 @@
-from server.game.player import Player
-from server.game.inventory import Inventory
+from typing import Optional
+
+from server.ai.context_manager import PlayerContext
 from server.ai.gemini_client import gemini
 from server.ai.prompts import ITEM_USE_PROMPT
-from server.ai.context_manager import PlayerContext
+from server.game.inventory import Inventory, Item
+from server.game.player import Player
 
 
-def _get_item_by_name(self, name: str):
+def _get_item_by_name(self: Inventory, name: str) -> Optional[Item]:
     name_lower = name.lower()
     for item in self._items:
         if item.name.lower() == name_lower or name_lower in item.name.lower():
@@ -13,8 +15,8 @@ def _get_item_by_name(self, name: str):
     return None
 
 
-# Monkey-patch Inventory with name lookup
-Inventory.get_item_by_name = _get_item_by_name
+# Monkey-patch Inventory with name lookup and declare it for type checkers
+Inventory.get_item_by_name = _get_item_by_name  # type: ignore[attr-defined]
 
 
 def handle_inventory(player: Player) -> str:
@@ -22,7 +24,7 @@ def handle_inventory(player: Player) -> str:
 
 
 def handle_use_item(player: Player, item_name: str, context: PlayerContext) -> str:
-    item = player.inventory.get_item_by_name(item_name)
+    item: Optional[Item] = player.inventory.get_item_by_name(item_name)  # type: ignore[attr-defined]
     if not item:
         return f"  Item '{item_name}' not found in your inventory."
 

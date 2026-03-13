@@ -1,6 +1,8 @@
+import socket
 import uuid
 from dataclasses import dataclass, field
 from typing import Dict, Optional
+
 from server.game.inventory import Inventory, STARTER_ITEMS
 
 
@@ -37,7 +39,7 @@ class PlayerStats:
             return True
         return False
 
-    def _level_up(self):
+    def _level_up(self) -> None:
         self.level += 1
         self.xp -= self.xp_to_next
         self.xp_to_next = int(self.xp_to_next * 1.5)
@@ -62,7 +64,7 @@ class PlayerStats:
 class Player:
     name: str
     address: tuple
-    socket: object
+    socket: socket.socket
     player_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     stats: PlayerStats = field(default_factory=PlayerStats)
     inventory: Inventory = field(default_factory=Inventory)
@@ -70,11 +72,11 @@ class Player:
     current_enemy: Optional[Dict] = None
     is_alive: bool = True
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         for item in STARTER_ITEMS:
             self.inventory.add_item(item)
 
-    def send(self, message: str):
+    def send(self, message: str) -> None:
         try:
             self.socket.send((message + "\n").encode())
         except Exception:
