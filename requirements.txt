@@ -1,5 +1,4 @@
-google-generativeai
-dotenv
-socket
-threading
-os
+google-generativeai>=0.8.0
+python-dotenv>=1.0.0
+colorama>=0.4.6
+pyfiglet>=1.0.2

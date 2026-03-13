@@ -1,18 +1,15 @@
-# Use an official Python runtime as a parent image
-FROM python:3.8
+FROM python:3.11-slim
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Copy only the necessary files (excluding .env)
-COPY ./*.py ./
-COPY requirements.txt ./
-
-# Install any needed dependencies specified in requirements.txt
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Set environment variables
-ENV PORT=3000
+COPY . .
 
-# Command to run your application, allowing overriding the port with environment variable
-CMD ["python", "server.py"]
+ENV PORT=4000
+ENV HOST=0.0.0.0
+
+EXPOSE 4000
+
+CMD ["python", "-m", "server.main"]
