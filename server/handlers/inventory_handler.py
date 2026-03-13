@@ -1,10 +1,25 @@
 from server.game.player import Player
+from server.game.inventory import Inventory
 from server.ai.gemini_client import gemini
 from server.ai.prompts import ITEM_USE_PROMPT
 from server.ai.context_manager import PlayerContext
 
+
+def _get_item_by_name(self, name: str):
+    name_lower = name.lower()
+    for item in self._items:
+        if item.name.lower() == name_lower or name_lower in item.name.lower():
+            return item
+    return None
+
+
+# Monkey-patch Inventory with name lookup
+Inventory.get_item_by_name = _get_item_by_name
+
+
 def handle_inventory(player: Player) -> str:
     return player.inventory.display()
+
 
 def handle_use_item(player: Player, item_name: str, context: PlayerContext) -> str:
     item = player.inventory.get_item_by_name(item_name)
@@ -19,7 +34,6 @@ def handle_use_item(player: Player, item_name: str, context: PlayerContext) -> s
     ai_response = gemini.generate(prompt, history=context.get_history())
     context.add_exchange(f"Uses {item.name}", ai_response)
 
-    # Parse effects
     result = ai_response + "\n"
     if "HP_RESTORED:" in ai_response:
         try:
@@ -35,14 +49,3 @@ def handle_use_item(player: Player, item_name: str, context: PlayerContext) -> s
         player.inventory.remove_item(item.name)
 
     return result
-
-
-# Monkey-patch Inventory with name lookup (cleaner than modifying the dataclass)
-from server.game.inventory import Inventory
-def _get_item_by_name(self, name: str):
-    name_lower = name.lower()
-    for item in self._items:
-        if item.name.lower() == name_lower or name_lower in item.name.lower():
-            return item
-    return None
-Inventory.get_item_by_name = _get_item_by_name

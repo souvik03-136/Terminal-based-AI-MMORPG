@@ -1,6 +1,6 @@
 from server.game.player import Player
 from server.session_manager import sessions
-from server.game.events import EventEngine
+
 
 def handle_help(player: Player) -> str:
     return """

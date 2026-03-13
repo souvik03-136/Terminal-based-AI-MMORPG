@@ -1,10 +1,10 @@
+import random
 from server.game.player import Player
 from server.game.combat import CombatEngine
 from server.game.events import EventEngine
-from server.ai.gemini_client import gemini
-from server.ai.prompts import COMBAT_PROMPT
 from server.ai.context_manager import PlayerContext
 from server.session_manager import sessions
+
 
 def handle_fight(player: Player, context: PlayerContext) -> str:
     if not player.in_combat or not player.current_enemy:
@@ -16,7 +16,6 @@ def handle_fight(player: Player, context: PlayerContext) -> str:
 
     summary = CombatEngine.combat_summary(player, p_dmg, e_dmg, p_crit, e_crit)
 
-    # Check outcomes
     outcome_msg = ""
     if enemy["hp"] <= 0:
         xp_gain = enemy["xp"]
@@ -56,8 +55,7 @@ def handle_fight(player: Player, context: PlayerContext) -> str:
 def handle_flee(player: Player, context: PlayerContext) -> str:
     if not player.in_combat:
         return "  You're not in combat."
-    import random
-    if random.randint(1, 100) <= 40:  # 40% flee chance
+    if random.randint(1, 100) <= 40:
         player.in_combat = False
         player.current_enemy = None
         return (

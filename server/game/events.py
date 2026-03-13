@@ -1,7 +1,7 @@
 import random
 from typing import Dict, Any
-from server.game.dice import Dice
 from server.game.inventory import COMMON_LOOT, UNCOMMON_LOOT, RARE_LOOT
+
 
 class EventEngine:
     """Handles random dungeon events: traps, treasure, ambushes, passages."""
@@ -11,10 +11,10 @@ class EventEngine:
         {"name": "Skeleton",        "hp": 30, "attack": 8,  "defense": 4, "xp": 20, "gold": 8},
         {"name": "Giant Spider",    "hp": 25, "attack": 10, "defense": 3, "xp": 25, "gold": 3},
         {"name": "Dark Cultist",    "hp": 40, "attack": 12, "defense": 5, "xp": 35, "gold": 15},
-        {"name": "Stone Golem",     "hp": 80, "attack": 18, "defense": 12,"xp": 75, "gold": 30},
+        {"name": "Stone Golem",     "hp": 80, "attack": 18, "defense": 12, "xp": 75, "gold": 30},
         {"name": "Vampire Thrall",  "hp": 55, "attack": 14, "defense": 7, "xp": 50, "gold": 20},
         {"name": "Shadow Wraith",   "hp": 45, "attack": 16, "defense": 8, "xp": 60, "gold": 10},
-        {"name": "Ancient Dragon",  "hp": 200,"attack": 35, "defense": 20,"xp":300, "gold":200},
+        {"name": "Ancient Dragon",  "hp": 200, "attack": 35, "defense": 20, "xp": 300, "gold": 200},
     ]
 
     TRAP_TYPES = [
@@ -30,7 +30,6 @@ class EventEngine:
         """Scale monster selection to dungeon floor."""
         pool_size = min(floor + 2, len(EventEngine.MONSTER_TEMPLATES))
         template = random.choice(EventEngine.MONSTER_TEMPLATES[:pool_size]).copy()
-        # Scale HP and attack slightly by floor
         scale = 1 + (floor - 1) * 0.15
         template["hp"] = int(template["hp"] * scale)
         template["attack"] = int(template["attack"] * scale)
@@ -54,7 +53,7 @@ class EventEngine:
 
     @staticmethod
     def should_trigger_event() -> bool:
-        return random.randint(1, 100) <= 25  # 25% chance per movement
+        return random.randint(1, 100) <= 25
 
     @staticmethod
     def pick_event_type() -> str:

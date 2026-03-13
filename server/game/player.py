@@ -1,7 +1,8 @@
 import uuid
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional
-from server.game.inventory import Inventory, Item, STARTER_ITEMS
+from typing import Dict, Optional
+from server.game.inventory import Inventory, STARTER_ITEMS
+
 
 @dataclass
 class PlayerStats:
@@ -45,7 +46,7 @@ class PlayerStats:
         self.attack += 3
         self.defense += 2
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> Dict:
         return {
             "HP": f"{self.hp}/{self.max_hp}",
             "ATK": self.attack,
@@ -61,7 +62,7 @@ class PlayerStats:
 class Player:
     name: str
     address: tuple
-    socket: object  # socket.socket — not type-hinted to avoid circular import
+    socket: object
     player_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     stats: PlayerStats = field(default_factory=PlayerStats)
     inventory: Inventory = field(default_factory=Inventory)
@@ -77,7 +78,7 @@ class Player:
         try:
             self.socket.send((message + "\n").encode())
         except Exception:
-            pass  # Handled at connection level
+            pass
 
     def stats_block(self) -> str:
         s = self.stats

@@ -1,7 +1,5 @@
-import random
 from server.game.player import Player
 from server.game.events import EventEngine
-from server.game.combat import CombatEngine
 from server.ai.gemini_client import gemini
 from server.ai.prompts import MOVEMENT_PROMPT
 from server.ai.context_manager import PlayerContext
@@ -12,6 +10,7 @@ VALID_DIRECTIONS = {
     "e": "east",  "east": "east",
     "w": "west",  "west": "west",
 }
+
 
 def handle_movement(player: Player, direction: str, context: PlayerContext) -> str:
     direction_key = direction.lower().strip()
@@ -30,15 +29,14 @@ def handle_movement(player: Player, direction: str, context: PlayerContext) -> s
 
     ai_response = gemini.generate(prompt, history=context.get_history())
     context.add_exchange(f"Player moves {full_dir}", ai_response)
-    context.set_dungeon_summary(ai_response[:300])  # Update world context
+    context.set_dungeon_summary(ai_response[:300])
 
-    # Parse AI signal for events
     result_lines = [ai_response]
 
     if "DEAD_END" in ai_response:
         pass  # Already narrated
     elif "EVENT: AMBUSH" in ai_response or (
-        EventEngine.should_trigger_event() and not "DEAD_END" in ai_response
+        EventEngine.should_trigger_event() and "DEAD_END" not in ai_response
     ):
         event_type = "AMBUSH" if "EVENT: AMBUSH" in ai_response else EventEngine.pick_event_type()
         result_lines.append(_handle_event(player, event_type))

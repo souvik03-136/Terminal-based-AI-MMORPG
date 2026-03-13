@@ -1,5 +1,3 @@
-import sys
-
 class InputHandler:
     """Handles user input with basic validation."""
 
@@ -24,14 +22,11 @@ class InputHandler:
         if not raw:
             return ""
 
-        # Expand shorthand aliases
         lower = raw.lower()
         if lower in self.ALIASES:
             return self.ALIASES[lower]
 
-        # Ensure slash commands start with /
         if raw.startswith("/") or raw.startswith(" "):
             return raw
 
-        # Otherwise treat as free-form (AI chat or action)
         return raw

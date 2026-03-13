@@ -1,5 +1,6 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional
+
 
 @dataclass
 class Item:
@@ -21,7 +22,6 @@ class Inventory:
         self._items: List[Item] = []
 
     def add_item(self, item: Item) -> bool:
-        # Stack potions/misc
         for existing in self._items:
             if existing.name == item.name and existing.item_type == item.item_type:
                 existing.quantity += item.quantity
@@ -61,9 +61,9 @@ class Inventory:
 
 # Default starter kit
 STARTER_ITEMS = [
-    Item("Rusty Dagger",   "weapon",  value=5,  effect=3,  description="A worn blade. Better than nothing."),
-    Item("Health Potion",  "potion",  value=20, effect=30, description="Restores 30 HP.", quantity=2),
-    Item("Torch",          "misc",    value=2,  effect=0,  description="Lights the darkness."),
+    Item("Rusty Dagger",  "weapon", value=5,  effect=3,  description="A worn blade. Better than nothing."),
+    Item("Health Potion", "potion", value=20, effect=30, description="Restores 30 HP.", quantity=2),
+    Item("Torch",         "misc",   value=2,  effect=0,  description="Lights the darkness."),
 ]
 
 # Loot tables
@@ -74,14 +74,14 @@ COMMON_LOOT = [
 ]
 
 UNCOMMON_LOOT = [
-    Item("Short Sword",     "weapon", value=40, effect=8,  description="A reliable blade."),
-    Item("Leather Armor",   "armor",  value=35, effect=5,  description="+5 DEF."),
-    Item("Greater Potion",  "potion", value=40, effect=60, description="Restores 60 HP."),
-    Item("Skeleton Key",    "key",    value=25, effect=0,  description="Opens most locks."),
+    Item("Short Sword",    "weapon", value=40, effect=8,  description="A reliable blade."),
+    Item("Leather Armor",  "armor",  value=35, effect=5,  description="+5 DEF."),
+    Item("Greater Potion", "potion", value=40, effect=60, description="Restores 60 HP."),
+    Item("Skeleton Key",   "key",    value=25, effect=0,  description="Opens most locks."),
 ]
 
 RARE_LOOT = [
     Item("Enchanted Blade", "weapon", value=120, effect=18, description="Glows faintly. +18 ATK."),
-    Item("Ring of Vitality","misc",   value=100, effect=25, description="+25 max HP."),
+    Item("Ring of Vitality", "misc",  value=100, effect=25, description="+25 max HP."),
     Item("Dragon Scale",    "armor",  value=150, effect=12, description="+12 DEF. Rare."),
 ]

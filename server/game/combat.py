@@ -1,7 +1,7 @@
-import random
-from typing import Dict, Tuple
+from typing import Tuple
 from server.game.player import Player
 from server.game.dice import Dice
+
 
 class CombatEngine:
     """Turn-based combat system."""
