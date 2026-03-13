@@ -1,0 +1,221 @@
+version: "3"
+
+# ─────────────────────────────────────────────
+#  Dungeon Explorer — Taskfile
+#  https://taskfile.dev
+#  Install: sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+# ─────────────────────────────────────────────
+
+vars:
+  PROJECT_NAME: dungeon-explorer
+  PYTHON: python3
+  PIP: pip3
+  VENV_DIR: .venv
+  SERVER_MODULE: server.main
+  CLIENT_MODULE: client.main
+  PORT: 4000
+  DOCKER_IMAGE: "{{.PROJECT_NAME}}:latest"
+
+env:
+  PYTHONDONTWRITEBYTECODE: "1"
+  PYTHONUNBUFFERED: "1"
+
+tasks:
+
+  # ── SETUP ─────────────────────────────────
+  default:
+    desc: "Show available tasks"
+    silent: true
+    cmds:
+      - task --list
+
+  setup:
+    desc: "Full first-time setup: venv + install + .env"
+    cmds:
+      - task: venv
+      - task: install
+      - task: env:init
+      - echo ""
+      - "echo \"✅  Setup complete. Edit .env and add your GEMINI_API_KEY, then run: task server\""
+
+  venv:
+    desc: "Create Python virtual environment"
+    cmds:
+      - "{{.PYTHON}} -m venv {{.VENV_DIR}}"
+      - echo "✅  Virtual environment created at {{.VENV_DIR}}"
+    status:
+      - test -d "{{.VENV_DIR}}"
+
+  install:
+    desc: "Install Python dependencies"
+    cmds:
+      - "{{.VENV_DIR}}/bin/pip install --upgrade pip -q"
+      - "{{.VENV_DIR}}/bin/pip install -r requirements.txt -q"
+      - echo "✅  Dependencies installed"
+
+  install:dev:
+    desc: "Install dev dependencies (pytest, ruff, mypy)"
+    cmds:
+      - "{{.VENV_DIR}}/bin/pip install pytest pytest-cov ruff mypy -q"
+      - echo "✅  Dev dependencies installed"
+
+  env:init:
+    desc: "Create .env from .env.example if it doesn't exist"
+    cmds:
+      - cp .env.example .env
+      - echo "✅  .env created — add your GEMINI_API_KEY"
+    status:
+      - test -f .env
+
+  # ── DEVELOPMENT ───────────────────────────
+  server:
+    desc: "Start the game server"
+    dotenv: [".env"]
+    cmds:
+      - echo "🏰  Starting Dungeon Explorer server on port {{.PORT}}..."
+      - "{{.VENV_DIR}}/bin/python -m {{.SERVER_MODULE}}"
+
+  server:dev:
+    desc: "Start server with auto-reload on file changes (requires watchdog)"
+    dotenv: [".env"]
+    cmds:
+      - "{{.VENV_DIR}}/bin/pip install watchdog -q"
+      - "{{.VENV_DIR}}/bin/watchmedo auto-restart --patterns='*.py' --recursive -- python -m {{.SERVER_MODULE}}"
+
+  client:
+    desc: "Connect a client to localhost"
+    cmds:
+      - "{{.VENV_DIR}}/bin/python -m {{.CLIENT_MODULE}} --host localhost --port {{.PORT}}"
+
+  client:remote:
+    desc: "Connect to a remote server. Usage: task client:remote HOST=<ip> PORT=<port>"
+    vars:
+      HOST: '{{default "localhost" .HOST}}'
+      REMOTE_PORT: '{{default .PORT .PORT}}'
+    cmds:
+      - "{{.VENV_DIR}}/bin/python -m {{.CLIENT_MODULE}} --host {{.HOST}} --port {{.REMOTE_PORT}}"
+
+  # ── CODE QUALITY ──────────────────────────
+  lint:
+    desc: "Lint code with ruff"
+    cmds:
+      - "{{.VENV_DIR}}/bin/ruff check server/ client/"
+
+  lint:fix:
+    desc: "Auto-fix lint issues"
+    cmds:
+      - "{{.VENV_DIR}}/bin/ruff check --fix server/ client/"
+
+  format:
+    desc: "Format code with ruff formatter"
+    cmds:
+      - "{{.VENV_DIR}}/bin/ruff format server/ client/"
+
+  format:check:
+    desc: "Check formatting without changing files"
+    cmds:
+      - "{{.VENV_DIR}}/bin/ruff format --check server/ client/"
+
+  typecheck:
+    desc: "Run mypy type checking"
+    cmds:
+      - "{{.VENV_DIR}}/bin/mypy server/ client/ --ignore-missing-imports"
+
+  check:
+    desc: "Run all quality checks (lint + format + typecheck)"
+    cmds:
+      - task: lint
+      - task: format:check
+      - task: typecheck
+      - echo "✅  All checks passed"
+
+  # ── TESTING ───────────────────────────────
+  test:
+    desc: "Run all tests"
+    cmds:
+      - "{{.VENV_DIR}}/bin/pytest tests/ -v"
+
+  test:cov:
+    desc: "Run tests with coverage report"
+    cmds:
+      - "{{.VENV_DIR}}/bin/pytest tests/ -v --cov=server --cov=client --cov-report=term-missing --cov-report=html"
+      - 'echo "📊  HTML report: htmlcov/index.html"'
+
+  test:watch:
+    desc: "Run tests in watch mode"
+    cmds:
+      - "{{.VENV_DIR}}/bin/pip install pytest-watch -q"
+      - "{{.VENV_DIR}}/bin/ptw tests/"
+
+  # ── DOCKER ────────────────────────────────
+  docker:build:
+    desc: "Build Docker image"
+    cmds:
+      - docker build -t {{.DOCKER_IMAGE}} .
+      - echo "✅  Built {{.DOCKER_IMAGE}}"
+
+  docker:run:
+    desc: "Run server in Docker"
+    cmds:
+      - docker run --rm -p {{.PORT}}:{{.PORT}} --env-file .env {{.DOCKER_IMAGE}}
+
+  docker:up:
+    desc: "Start full stack with docker-compose"
+    cmds:
+      - docker-compose up --build
+
+  docker:down:
+    desc: "Stop docker-compose stack"
+    cmds:
+      - docker-compose down
+
+  docker:logs:
+    desc: "Follow docker-compose logs"
+    cmds:
+      - docker-compose logs -f
+
+  docker:clean:
+    desc: "Remove built Docker image"
+    cmds:
+      - docker rmi {{.DOCKER_IMAGE}} --force
+      - echo "🗑  Removed {{.DOCKER_IMAGE}}"
+
+  # ── MAINTENANCE ───────────────────────────
+  clean:
+    desc: "Remove build artifacts and cache files"
+    cmds:
+      - find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+      - find . -type f -name "*.pyc" -delete 2>/dev/null || true
+      - find . -type f -name "*.pyo" -delete 2>/dev/null || true
+      - rm -rf .pytest_cache htmlcov .coverage .mypy_cache .ruff_cache 2>/dev/null || true
+      - echo "🧹  Cleaned build artifacts"
+
+  clean:all:
+    desc: "Full clean including venv"
+    cmds:
+      - task: clean
+      - rm -rf {{.VENV_DIR}}
+      - echo "🧹  Removed virtual environment"
+
+  deps:update:
+    desc: "Update all dependencies to latest"
+    cmds:
+      - "{{.VENV_DIR}}/bin/pip install --upgrade -r requirements.txt"
+      - "{{.VENV_DIR}}/bin/pip freeze > requirements.txt"
+      - echo "✅  Dependencies updated and frozen"
+
+  deps:audit:
+    desc: "Audit dependencies for security vulnerabilities"
+    cmds:
+      - "{{.VENV_DIR}}/bin/pip install pip-audit -q"
+      - "{{.VENV_DIR}}/bin/pip-audit"
+
+  # ── CI ────────────────────────────────────
+  ci:
+    desc: "Run full CI pipeline (check + test)"
+    cmds:
+      - task: install
+      - task: install:dev
+      - task: check
+      - task: test
+      - echo "✅  CI pipeline passed"
