@@ -30,6 +30,9 @@ jobs:
       - name: Run ruff lint
         run: ruff check server/ client/
 
+      - name: Auto-format code
+        run: ruff format server/ client/
+
       - name: Run ruff format check
         run: ruff format --check server/ client/
 
